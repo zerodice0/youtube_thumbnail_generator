@@ -1,4 +1,4 @@
-import { exec, ExecException } from "child_process";
+import { exec } from "child_process";
 import path from "path";
 import { promisify } from "util";
 

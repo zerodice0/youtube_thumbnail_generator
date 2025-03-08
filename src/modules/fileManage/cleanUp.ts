@@ -2,8 +2,9 @@ import path from "path";
 import fs from "fs-extra";
 
 import { DonwloadStatus, DonwloadStatusType } from "../../models/DownloadStatusType";
+import prisma from "../../prisma";
 
-const FILE_EXPIRATION_TIME = 1000 * 60 * 60 * 3; // 3 hours
+const FILE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 14; // 14 days
 
 const cleanUpDownloads = async (
   audioDownloadPath: string,
@@ -11,62 +12,47 @@ const cleanUpDownloads = async (
 ) => {
   console.log("🧹 Running cleanup task");
 
-  try {
-    const audioFiles = fs.readdirSync(audioDownloadPath);
-    audioFiles.forEach((file) => {
-      const filePath = path.join(audioDownloadPath, file);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    });
+  const downloads = await prisma.download.findMany({
+    where: {
+      status: DonwloadStatus.failed,
+    },
+  });
 
-    const subtitleFiles = fs.readdirSync(subtitleDownloadPath);
-    subtitleFiles.forEach((file) => {
-      const filePath = path.join(subtitleDownloadPath, file);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    });
-  } catch (error) {
-    console.error("❌ Failed to clean up downloads", error);
-  }
+  downloads.forEach(async (download) => {
+    if (download.audioFilePath && fs.existsSync(download.audioFilePath)) {
+      fs.unlinkSync(download.audioFilePath);
+    }
+    if (download.subtitleFilePath && fs.existsSync(download.subtitleFilePath)) {
+      fs.unlinkSync(download.subtitleFilePath);
+    }
+  });
 }
 
-const cleanUpOldDownloads = async (
-  downloadStatus: Record<string, DonwloadStatusType>
-) => {
+const cleanUpOldDownloads = async () => {
   console.log("🧹 Running cleanup task");
   
   const now = Date.now();
-  Object.keys(downloadStatus).forEach((uuid) => {
-    const status = downloadStatus[uuid];
-    status.completedAt && console.log(now - status.completedAt);
-    if (
-      (status.status === DonwloadStatus.completed || status.status === DonwloadStatus.failed)
-      && (status.completedAt && ((now - status.completedAt) > FILE_EXPIRATION_TIME))
-    ) {
-      console.log (status.audioFilePath, status.subtitleFilePath);
+  const downloads = await prisma.download.findMany({
+    where: {
+      status: {
+        in: [DonwloadStatus.failed, DonwloadStatus.completed],
+      },
+    },
+  });
 
-      if (status.audioFilePath && fs.existsSync(status.audioFilePath)) {
-        console.log(`🧹 [${uuid}] Deleting file: ${status.audioFilePath}`);
-        try {
-          // remove old file
-          status.audioFilePath && fs.unlinkSync(status.audioFilePath);
-          // remove record from downloadStatus
-          delete downloadStatus[uuid];
-        } catch (error) {
-          console.error(`❌ [${uuid}] Failed to delete file: ${status.audioFilePath}`);
-        }
+  downloads.forEach(async (download) => {
+    if ((now - (download.completedAt?.getTime() ?? 0)) > FILE_EXPIRATION_TIME) {
+      if (download.audioFilePath && fs.existsSync(download.audioFilePath)) {
+        fs.unlinkSync(download.audioFilePath);
       }
-      if (status.subtitleFilePath && fs.existsSync(status.subtitleFilePath)) {
-        console.log(`🧹 [${uuid}] Deleting file: ${status.subtitleFilePath}`);
-        try {
-          // remove old file
-          status.subtitleFilePath && fs.unlinkSync(status.subtitleFilePath);
-        } catch (error) {
-          console.error(`❌ [${uuid}] Failed to delete file: ${status.subtitleFilePath}`);
-        }
+      if (download.subtitleFilePath && fs.existsSync(download.subtitleFilePath)) {
+        fs.unlinkSync(download.subtitleFilePath);
       }
+      await prisma.download.delete({
+        where: {
+          id: download.id,
+        },
+      });
     }
   });
 }
