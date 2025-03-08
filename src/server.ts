@@ -1,17 +1,22 @@
-import express, { Request, RequestHandler, Response } from "express";
+import express, { Request, Response } from "express";
 import path from "path";
 import fs from "fs-extra";
+import dotenv from "dotenv";
+
 import { randomUUID } from "crypto";
 
 import { downloadYoutubeAudio } from "./modules/youtube/downloadYoutubeAudio";
 import { transcribeAudio } from "./modules/whisper/transcribeAudio";
-import { cleanUpDownloads, cleanUpOldDownloads } from "./modules/cleanUp/cleanUp";
+import { cleanUpDownloads, cleanUpOldDownloads } from "./modules/fileManage/cleanUp";
 
 import { DonwloadStatus, DonwloadStatusType } from "./models/DownloadStatusType";
+import { summarizeText } from "./modules/openai/openai";
 
 const app = express();
 app.use(express.json());
 app.use('/', express.static(path.join(__dirname, '..', 'public')));
+dotenv.config();
+
 const PORT = process.env.PORT || 3000;
 
 const PROJECT_ROOT = process.cwd();
@@ -85,6 +90,32 @@ app.get("/download/youtube/audio/status/:uuid", (req: Request, res: Response) =>
     return;
   }
   res.status(200).json({ uuid, status });
+});
+
+app.get("/contents/digest/:uuid", async (req: Request, res: Response) => {
+  const { uuid } = req.params;
+  console.log(`🔍 [${uuid}] Checking digest`);
+  const status = downloadStatus[uuid];
+  if (!status) {
+    res.status(404).json({ error: "Download not found" });
+    return;
+  }
+
+  const { subtitleFilePath } = status;
+  const subtitleData = subtitleFilePath && fs.readFileSync(subtitleFilePath, "utf-8");
+
+  if (!subtitleData) {
+    res.status(404).json({ error: "Subtitle not found" });
+    return;
+  }
+
+  const summary = await summarizeText(subtitleData);
+  if (!summary) {
+    res.status(404).json({ error: "Summary not found" });
+    return;
+  }
+
+  res.status(200).json({ uuid, status: DonwloadStatus.completed, summary });
 });
 
 const initDownloadDirectories = () => {
