@@ -10,7 +10,7 @@ const transcribeAudio = async (
   uuid: string,
 ):Promise<string> => {
   console.log(`📝 [${uuid}] Transcribing started for: ${audioFilePath}`);
-  const subtitleFilePath = path.join(subtitleDownloadPath, `subtitle_${uuid}.srt`);
+  const subtitleFilePath = path.join(subtitleDownloadPath, `subtitle_${uuid}`);
   
   try {
     await execAsync(`${process.env.WHISPER_BIN_PATH}/whisper-cli -m ${process.env.WHISPER_MODEL_PATH}/ggml-large-v3-turbo.bin -l auto -f "${audioFilePath}" -osrt -of "${subtitleFilePath}"`);
@@ -18,8 +18,8 @@ const transcribeAudio = async (
     throw new Error(`❌ [${uuid}] Transcribing error: ${error}`);
   }
 
-  console.log(`✅ [${uuid}] Transcribing complete: ${subtitleFilePath}`);
-  return subtitleFilePath;
+  console.log(`✅ [${uuid}] Transcribing complete: ${subtitleFilePath}.srt`);
+  return `${subtitleFilePath}.srt`;
 }
 
 export { transcribeAudio };
