@@ -3,8 +3,8 @@ import path from "path";
 import fs from "fs-extra";
 import { randomUUID } from "crypto";
 
-import downloadYoutubeAudio from "./modules/youtube/downloadYoutubeAudio";
-import transcribeAudio from "./modules/whisper/transcribeAudio";
+import { downloadYoutubeAudio } from "./modules/youtube/downloadYoutubeAudio";
+import { transcribeAudio } from "./modules/whisper/transcribeAudio";
 import { cleanUpDownloads, cleanUpOldDownloads } from "./modules/cleanUp/cleanUp";
 
 import { DonwloadStatus, DonwloadStatusType } from "./models/DownloadStatusType";
@@ -21,55 +21,57 @@ const CLEAN_UP_INTERVAL = 1000 * 60 * 60; // 1 hour
 
 const downloadStatus: Record<string, DonwloadStatusType> = {};
 
-app.post("/download/youtube/audio", (req: Request, res: Response) => {
-  const { youtubeUrl } = req.body;
-  const uuid = randomUUID();
-
+const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) => {
   downloadStatus[uuid] = {
     status: DonwloadStatus.pending,
   };
 
-  downloadYoutubeAudio(
-    youtubeUrl,
-    AUDIO_DOWNLOAD_PATH,
-    uuid,
-    // success callback
-    (audioFilePath) => {
-      downloadStatus[uuid] = {
-        status: DonwloadStatus.transcribing,
-        audioFilePath,
-        completedAt: Date.now(),
-      };
+  try {
+    const audioFilePath = await downloadYoutubeAudio(
+      youtubeUrl,
+      AUDIO_DOWNLOAD_PATH,
+      uuid,
+    );
+  
+    downloadStatus[uuid] = {
+      status: DonwloadStatus.transcribing,
+      audioFilePath,
+      completedAt: Date.now(),
+    };
 
-      transcribeAudio(
-        audioFilePath,
-        SUBTITLE_DOWNLOAD_PATH,
-        uuid,
-        (subtitleFilePath) => {
-          downloadStatus[uuid] = {
-            status: DonwloadStatus.completed,
-            audioFilePath,
-            subtitleFilePath,
-            completedAt: Date.now(),
-          };
-        }, (stderr) => {
-          downloadStatus[uuid] = {
-            status: DonwloadStatus.failed,
-            error: stderr,
-            completedAt: Date.now(),
-          };
-        });
+    downloadStatus[uuid] = {
+      status: DonwloadStatus.transcribing,
+      audioFilePath,
+      completedAt: Date.now(),
+    };
+  
+    const subtitleFilePath = await transcribeAudio(
+      audioFilePath,
+      SUBTITLE_DOWNLOAD_PATH,
+      uuid,
+    );
+    
+    downloadStatus[uuid] = {
+      status: DonwloadStatus.completed,
+      audioFilePath,
+      subtitleFilePath,
+      completedAt: Date.now(),
+    };
 
-      },
-    // error callback
-    (stderr) => {
-      downloadStatus[uuid] = {
-        status: DonwloadStatus.failed,
-        error: stderr,
-        completedAt: Date.now(),
-      };
-    }
-  );
+  } catch (error) {
+    downloadStatus[uuid] = {
+      status: DonwloadStatus.failed,
+      error: (error as Error).message,
+      completedAt: Date.now(),
+    };
+  }
+}
+
+app.post("/download/youtube/audio", async (req: Request, res: Response) => {
+  const { youtubeUrl } = req.body;
+  const uuid = randomUUID();
+  
+  requestYoutubeAudioTranscribe(youtubeUrl, uuid);
 
   res.status(202).json({ uuid, status: DonwloadStatus.pending });
 });
