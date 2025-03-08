@@ -8,3 +8,4 @@ downloads
 .env.production.local
 .env.development
 .env.test
+.DS_Store
