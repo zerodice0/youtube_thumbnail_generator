@@ -1,5 +1,4 @@
 ### Youtube Thumbnail Generator
-
 This is a simple script that generates a thumbnail for a youtube video. using yt-dlp to download the youtube video and whisper.cpp to transcribe the video.
 
 # Prisma Commands
@@ -13,6 +12,10 @@ npx prisma migrate dev --name init
 npx prisma migrate deploy
 ```
 
+### Execute Prisma on Docker
+```
+docker run --name postgres-db -e POSTGRES_USER=your_username -e POSTGRES_PASSWORD=your_password -e POSTGRES_DB=your_database -p 5432:5432 -d postgres
+```
 
 # Docker Commands
 ### How to build docker image
