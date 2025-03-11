@@ -34,7 +34,7 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
   }
 
   try {
-    const audioFilePath = await downloadYoutubeAudio(
+    await downloadYoutubeAudio(
       youtubeUrl,
       AUDIO_DOWNLOAD_PATH,
       uuid,
@@ -43,13 +43,13 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
     await prisma.download.update({
       where: { id: uuid },
       data: {
-        audioFilePath: `${process.env.BASE_URL}:${process.env.PORT}/downloads/audio/audio_${uuid}.mp3`,
+        audioFilePath: `/downloads/audio/audio_${uuid}.mp3`,
         status: DonwloadStatus.transcribing,
       },
     });
 
-    const subtitleFilePath = await transcribeAudio(
-      audioFilePath,
+    await transcribeAudio(
+      `${PROJECT_ROOT}/downloads/audio/audio_${uuid}.mp3`,
       SUBTITLE_DOWNLOAD_PATH,
       uuid,
     );
@@ -57,7 +57,7 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
     await prisma.download.update({
       where: { id: uuid },
       data: {
-        subtitleFilePath: `${process.env.BASE_URL}:${process.env.PORT}/downloads/subtitle/subtitle_${uuid}.srt`,
+        subtitleFilePath: `/downloads/subtitle/subtitle_${uuid}.srt`,
         status: DonwloadStatus.completed,
         completedAt: new Date(),
       },
@@ -89,7 +89,13 @@ app.post("/download/youtube/audio", async (req: Request, res: Response) => {
   });
   
   if (existingDownload) {
-    res.status(200).json({ uuid: existingDownload.id, status: existingDownload.status });
+    res.status(200).json({ 
+      uuid: existingDownload.id, 
+      status: existingDownload.status,
+      audioFilePath: `${process.env.BASE_URL}:${process.env.PORT}${existingDownload.audioFilePath}`,
+      subtitleFilePath: `${process.env.BASE_URL}:${process.env.PORT}${existingDownload.subtitleFilePath}`,
+      summary: existingDownload.summary,
+    });
     return;
   }
 
@@ -123,13 +129,13 @@ app.get("/download/youtube/audio/status/:uuid", async (req: Request, res: Respon
   res.status(200).json({ 
     uuid,
     status: download.status,
-    audioFilePath: download.audioFilePath,
-    subtitleFilePath: download.subtitleFilePath,
+    audioFilePath: `${process.env.BASE_URL}:${process.env.PORT}${download.audioFilePath}`,
+    subtitleFilePath: `${process.env.BASE_URL}:${process.env.PORT}${download.subtitleFilePath}`,
     summary: download.summary,
   });
 });
 
-app.get("/contents/digest/:uuid", async (req: Request, res: Response) => {
+app.get("/download/youtube/audio/summary/:uuid", async (req: Request, res: Response) => {
   const { uuid } = req.params;
   console.log(`🔍 [${uuid}] Checking digest`);
 
@@ -143,7 +149,7 @@ app.get("/contents/digest/:uuid", async (req: Request, res: Response) => {
   }
 
   const { subtitleFilePath } = download;
-  const subtitleData = subtitleFilePath && fs.readFileSync(subtitleFilePath, "utf-8");
+  const subtitleData = subtitleFilePath && fs.readFileSync(`${PROJECT_ROOT}/${subtitleFilePath}`, "utf-8");
 
   if (!subtitleData) {
     res.status(404).json({ error: "Subtitle not found" });
@@ -156,7 +162,18 @@ app.get("/contents/digest/:uuid", async (req: Request, res: Response) => {
     return;
   }
 
-  res.status(200).json({ uuid, status: DonwloadStatus.completed, summary });
+  await prisma.download.update({
+    where: { id: uuid },
+    data: { summary },
+  });
+
+  res.status(200).json({ 
+    uuid, 
+    status: DonwloadStatus.completed, 
+    audioFilePath: download.audioFilePath,
+    subtitleFilePath: download.subtitleFilePath,
+    summary,
+  });
 });
 
 const initDownloadDirectories = () => {

@@ -11,7 +11,7 @@ const summarizeText = async (text: string): Promise<string | null> => {
       messages: [
         {
           role: "user",
-          content: `다음 문단을 50자 이내로 요약해줘.:\n\n ${text}`,
+          content: `다음 문단을 세 문장 이내로 요약해줘.:\n\n ${text.substring(0, 1000)}`,
         },
       ],
     });

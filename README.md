@@ -2,6 +2,18 @@
 
 This is a simple script that generates a thumbnail for a youtube video. using yt-dlp to download the youtube video and whisper.cpp to transcribe the video.
 
+# Prisma Commands
+### How to create a new migration
+```
+npx prisma migrate dev --name init
+```
+
+### How to apply migrations
+```
+npx prisma migrate deploy
+```
+
+
 # Docker Commands
 ### How to build docker image
 ```
