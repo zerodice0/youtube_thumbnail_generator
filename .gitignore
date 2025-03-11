@@ -9,3 +9,4 @@ downloads
 .env.development
 .env.test
 .DS_Store
+/prisma/migrations
