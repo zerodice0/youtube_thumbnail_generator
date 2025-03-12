@@ -9,4 +9,5 @@ downloads
 .env.development
 .env.test
 .DS_Store
+.next
 /prisma/migrations
