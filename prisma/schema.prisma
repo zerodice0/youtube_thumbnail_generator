@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Download {
+model YoutubeAudioDownload {
   id        String   @id @default(uuid())
   youtubeUrl String
   audioFilePath String

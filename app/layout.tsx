@@ -1,4 +1,5 @@
 import React from 'react';
+import '@/app/api/_init';
 
 export const metadata = {
   title: 'YouTube Thumbnail Generator',

@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs-extra";
 
 import { DonwloadStatus, DonwloadStatusType } from "../../models/DownloadStatusType";
-import prisma from "../../prisma";
+import prisma from "@/lib/prisma";
 
 const FILE_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 14; // 14 days
 
@@ -12,7 +12,7 @@ const cleanUpDownloads = async (
 ) => {
   console.log("🧹 Running cleanup task");
 
-  const downloads = await prisma.download.findMany({
+  const downloads = await prisma.YoutubeAudioDownload.findMany({
     where: {
       status: DonwloadStatus.failed,
     },
@@ -32,7 +32,7 @@ const cleanUpOldDownloads = async () => {
   console.log("🧹 Running cleanup task");
   
   const now = Date.now();
-  const downloads = await prisma.download.findMany({
+  const downloads = await prisma.YoutubeAudioDownload.findMany({
     where: {
       status: {
         in: [DonwloadStatus.failed, DonwloadStatus.completed],
@@ -48,7 +48,7 @@ const cleanUpOldDownloads = async () => {
       if (download.subtitleFilePath && fs.existsSync(download.subtitleFilePath)) {
         fs.unlinkSync(download.subtitleFilePath);
       }
-      await prisma.download.delete({
+      await prisma.YoutubeAudioDownload.delete({
         where: {
           id: download.id,
         },
