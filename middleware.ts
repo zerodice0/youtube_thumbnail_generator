@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import path from 'path';
-import { initDownloadDirectories } from './lib/utils';
-
-// 앱 시작 시 다운로드 디렉토리 초기화
-initDownloadDirectories();
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

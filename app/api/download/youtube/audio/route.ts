@@ -7,7 +7,7 @@ import { transcribeAudio } from "@/src/modules/whisper/transcribeAudio";
 import { PROJECT_ROOT } from "@/lib/utils";
 
 const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) => {
-  const download = await prisma.YoutubeAudioDownload.findUnique({
+  const download = await prisma.youtubeAudioDownload.findUnique({
     where: { id: uuid },
   });
 
@@ -22,7 +22,7 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
       uuid,
     );
 
-    await prisma.YoutubeAudioDownload.update({
+    await prisma.youtubeAudioDownload.update({
       where: { id: uuid },
       data: {
         audioFilePath: `/downloads/audio/audio_${uuid}.mp3`,
@@ -31,12 +31,12 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
     });
 
     await transcribeAudio(
-      `${PROJECT_ROOT}/public/downloads/audio/audio_${uuid}.mp3`,
+      `${PROJECT_ROOT}/downloads/audio/audio_${uuid}.mp3`,
       SUBTITLE_DOWNLOAD_PATH,
       uuid,
     );
 
-    await prisma.YoutubeAudioDownload.update({
+    await prisma.youtubeAudioDownload.update({
       where: { id: uuid },
       data: {
         subtitleFilePath: `/downloads/subtitle/subtitle_${uuid}.srt`,
@@ -46,7 +46,7 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
     });
 
   } catch (error) {
-    await prisma.YoutubeAudioDownload.update({
+    await prisma.youtubeAudioDownload.update({
       where: { id: uuid },
       data: {
         status: DonwloadStatus.failed,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Youtube URL is required" }, { status: 400 });
   }
 
-  const existingDownload = await prisma.YoutubeAudioDownload.findFirst({
+  const existingDownload = await prisma.youtubeAudioDownload.findFirst({
     where: {
       youtubeUrl,
     },
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const download = await prisma.YoutubeAudioDownload.create({
+  const download = await prisma.youtubeAudioDownload.create({
     data: { 
       youtubeUrl,
       audioFilePath: "",

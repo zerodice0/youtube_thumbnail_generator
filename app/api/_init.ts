@@ -18,4 +18,6 @@ const initApp = () => {
 // 앱 초기화 실행
 initApp();
 
-export {}; 
+export default function init() {
+  return null;
+}; 

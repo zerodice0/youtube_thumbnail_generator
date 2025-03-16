@@ -12,7 +12,7 @@ const cleanUpDownloads = async (
 ) => {
   console.log("🧹 Running cleanup task");
 
-  const downloads = await prisma.YoutubeAudioDownload.findMany({
+  const downloads = await prisma.youtubeAudioDownload.findMany({
     where: {
       status: DonwloadStatus.failed,
     },
@@ -32,7 +32,7 @@ const cleanUpOldDownloads = async () => {
   console.log("🧹 Running cleanup task");
   
   const now = Date.now();
-  const downloads = await prisma.YoutubeAudioDownload.findMany({
+  const downloads = await prisma.youtubeAudioDownload.findMany({
     where: {
       status: {
         in: [DonwloadStatus.failed, DonwloadStatus.completed],
@@ -48,7 +48,7 @@ const cleanUpOldDownloads = async () => {
       if (download.subtitleFilePath && fs.existsSync(download.subtitleFilePath)) {
         fs.unlinkSync(download.subtitleFilePath);
       }
-      await prisma.YoutubeAudioDownload.delete({
+      await prisma.youtubeAudioDownload.delete({
         where: {
           id: download.id,
         },

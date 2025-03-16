@@ -6,11 +6,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { uuid: string } }
 ) {
-  const { uuid } = await params;
+  const { uuid } = params;
 
   console.log(`🔍 [${uuid}] Checking download status`);
 
-  const download = await prisma.YoutubeAudioDownload.findUnique({
+  const download = await prisma.youtubeAudioDownload.findUnique({
     where: { id: uuid },
   });
 
@@ -19,7 +19,7 @@ export async function GET(
   }
 
   return NextResponse.json({ 
-    uuid: uuid,
+    uuid,
     status: download.status,
     audioFilePath: getFullUrl(download.audioFilePath),
     subtitleFilePath: getFullUrl(download.subtitleFilePath),
