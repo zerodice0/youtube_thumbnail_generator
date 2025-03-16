@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { DonwloadStatus } from "@/lib/models/DownloadStatusType";
 import { getFullUrl, AUDIO_DOWNLOAD_PATH, SUBTITLE_DOWNLOAD_PATH } from "@/lib/utils";
-import { downloadYoutubeAudio } from "@/src/modules/youtube/downloadYoutubeAudio";
-import { transcribeAudio } from "@/src/modules/whisper/transcribeAudio";
+import { downloadYoutubeAudio } from "@/lib/modules/youtube/downloadYoutubeAudio";
+import { transcribeAudio } from "@/lib/modules/whisper/transcribeAudio";
 import { PROJECT_ROOT } from "@/lib/utils";
 
 const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) => {

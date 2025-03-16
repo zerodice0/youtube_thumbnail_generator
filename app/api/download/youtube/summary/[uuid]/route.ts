@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import prisma from "@/lib/prisma";
 import { DonwloadStatus } from "@/lib/models/DownloadStatusType";
 import { PROJECT_ROOT } from "@/lib/utils";
-import { summarizeText } from "@/src/modules/openai/openai";
+import { summarizeText } from "@/lib/modules/openai/openai";
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +12,7 @@ export async function GET(
   const { uuid } = params;
   console.log(`🔍 [${uuid}] Checking digest`);
 
-  const download = await prisma.download.findUnique({
+  const download = await prisma.youtubeAudioDownload.findUnique({
     where: { id: uuid },
   });
 
@@ -32,7 +32,7 @@ export async function GET(
     return NextResponse.json({ error: "Summary not found" }, { status: 404 });
   }
 
-  await prisma.download.update({
+  await prisma.youtubeAudioDownload.update({
     where: { id: uuid },
     data: { summary },
   });
