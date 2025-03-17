@@ -9,7 +9,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { uuid: string } }
 ) {
-  const { uuid } = params;
+  const { uuid } = await params;
   console.log(`🔍 [${uuid}] Checking digest`);
 
   const download = await prisma.youtubeAudioDownload.findUnique({

@@ -25,7 +25,7 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
     await prisma.youtubeAudioDownload.update({
       where: { id: uuid },
       data: {
-        audioFilePath: `/downloads/audio/audio_${uuid}.mp3`,
+        audioFilePath: `/api/download/youtube/audio/${uuid}`,
         status: DonwloadStatus.transcribing,
       },
     });
@@ -39,7 +39,7 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
     await prisma.youtubeAudioDownload.update({
       where: { id: uuid },
       data: {
-        subtitleFilePath: `/downloads/subtitle/subtitle_${uuid}.srt`,
+        subtitleFilePath: `/api/download/youtube/subtitle/${uuid}`,
         status: DonwloadStatus.completed,
         completedAt: new Date(),
       },

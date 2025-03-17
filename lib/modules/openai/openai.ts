@@ -1,24 +1,17 @@
-import OpenAI from "openai";
+import axios from "axios";
 
 const summarizeText = async (text: string): Promise<string | null> => {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
   try {
-    const summary = "test";
-    // const completion = await openai.chat.completions.create({
-    //   model: "gpt-4o-mini",
-    //   messages: [
-    //     {
-    //       role: "user",
-    //       content: `다음 문단을 세 문장 이내로 요약해줘.:\n\n ${text.substring(0, 1000)}`,
-    //     },
-    //   ],
-    // });
+    const summary = await axios.post(
+      `${process.env.OLLAMA_URL}/api/generate`,
+      {
+        "model": "gemma3:4b",
+        "prompt": `다음은 유튜브 영상의 자막 파일이야. 이 자막을 기반으로 영상의 내용을 다섯 문장 이내로 요약해줘. :\n\n ${text.trim().replace(/\n/g, ' ').substring(0, 2500)}`,
+        "stream": false
+      }
+    );
 
-    // const summary = completion.choices[0].message.content;
-    return summary;
+    return summary.data.response.replace(/\n/g, '').trim();
   } catch (error) {
     throw new Error(`❌ Summarizing error: ${error}`);
   }
