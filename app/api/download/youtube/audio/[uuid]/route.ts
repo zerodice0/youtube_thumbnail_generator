@@ -1,5 +1,8 @@
 import prisma from "@/lib/prisma";
+import { PROJECT_ROOT } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
+import path from "path";
+import fs from "fs-extra";
 
 export const runtime = 'nodejs';
 
@@ -9,18 +12,27 @@ export async function GET(
 ) {
   const { uuid } = await params;
 
-  console.log(uuid);
-
   const download = await prisma.youtubeAudioDownload.findUnique({
     where: { id: uuid },
   });
 
-  return new NextResponse('hello', { 
-    headers: {
-      'Content-Type': 'text/plain',
-      // 'Content-Disposition': `attachment; filename="${download?.audioFilePath}"`,
-      'Cache-Control': 'public, max-age=31536000',
-    },
-    status: 200, 
-  });
+  if (!download || !download.status) {
+    return NextResponse.json({ error: "Download not found" }, { status: 404 });
+  }
+
+  try {
+    const filePath = path.join(PROJECT_ROOT, 'downloads', 'audio', `audio_${uuid}.mp3`);
+    const fileBuffer = await fs.readFile(filePath);
+    let contentType = 'audio/mpeg';
+
+    return new NextResponse(fileBuffer, {
+      headers: {
+        'Content-Type': contentType,
+        'Content-Disposition': `inline; filename="${path.basename(filePath)}"`,
+      },
+    });
+  } catch (error) {
+    console.error('Error serving audio file:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } 
 }
