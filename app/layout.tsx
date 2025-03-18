@@ -1,9 +1,8 @@
 import React from 'react';
-import '@/app/api/_init';
 
 export const metadata = {
-  title: 'YouTube Thumbnail Generator',
-  description: 'Generate thumbnails from YouTube videos',
+  title: 'YouTube Audio Transcriptor',
+  description: 'Transcribe YouTube videos to text',
 };
 
 export default function RootLayout({
@@ -12,8 +11,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="next-app">
+      <head />
+      <body className="next-body bg-gray-100 min-h-screen">{children}</body>
     </html>
   )
 }

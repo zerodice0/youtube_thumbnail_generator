@@ -1,36 +1,51 @@
-import React from 'react';
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
+
+const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
 export default function Home() {
+  const [url, setUrl] = useState('');
+  const [error, setError] = useState('');
+
+  const validateYoutubeUrl = (url: string) => {
+    return YOUTUBE_URL_REGEX.test(url);
+  };
+
+  const handleTranscribe = () => {
+    if (!url.trim()) {
+      setError('Please enter a YouTube URL');
+      return;
+    }
+
+    if (!validateYoutubeUrl(url)) {
+      setError('Invalid YouTube URL');
+      return;
+    }
+
+    setError('');
+    
+    console.log('Transcribe button clicked', url);
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">YouTube Thumbnail Generator</h1>
-      
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <p className="mb-4">
+    <>
+      <header>
+        <h1>YouTube Audio Transcriptor</h1>
+        <p>
           This application allows you to download audio from YouTube videos, transcribe it, and generate summaries.
         </p>
-        
-        <p className="mb-4">
-          The API endpoints are:
-        </p>
-        
-        <ul className="list-disc pl-6 mb-6">
-          <li className="mb-2">
-            <code className="bg-gray-100 px-2 py-1 rounded">POST /api/download/youtube/audio</code> - Download and transcribe a YouTube video
-          </li>
-          <li className="mb-2">
-            <code className="bg-gray-100 px-2 py-1 rounded">GET /api/download/youtube/audio/status/:uuid</code> - Check the status of a download
-          </li>
-          <li className="mb-2">
-            <code className="bg-gray-100 px-2 py-1 rounded">GET /api/download/youtube/audio/summary/:uuid</code> - Get a summary of the transcribed content
-          </li>
-        </ul>
-        
-        <p>
-          For more information, please check the <Link href="/docs" className="text-blue-500 hover:underline">documentation</Link>.
-        </p>
-      </div>
-    </div>
+      </header>
+      <main>
+        <div >
+          <input type="text"
+            placeholder="YouTube URL"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)} />
+          <button onClick={handleTranscribe}>Transcribe!</button>
+        </div>
+        {error && <p>{error}</p>}
+      </main>
+    </>
   );
 } 
