@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="next-app">
       <head />
-      <body className="next-body bg-gray-100 min-h-screen">{children}</body>
+      <body>{children}</body>
     </html>
   )
 }
