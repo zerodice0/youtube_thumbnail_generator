@@ -20,13 +20,15 @@ export async function GET(
 
   try {
     const filePath = path.join(PROJECT_ROOT, 'downloads', 'subtitle', `subtitle_${uuid}.srt`);
-    const fileBuffer = await fs.readFile(filePath);
-    let contentType = 'text/plain';
-  
-    return new NextResponse(fileBuffer, {
+    
+    // 파일을 UTF-8 인코딩으로 직접 읽음
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    
+    // 텍스트/SRT 형식으로 제공하고 UTF-8 인코딩 명시
+    return new Response(fileContent, {
       headers: {
-        'Content-Type': contentType,
-        'Content-Disposition': `inline; filename="${path.basename(filePath)}"`,
+        'Content-Type': 'text/plain; charset=UTF-8',
+        'Content-Disposition': `attachment; filename="${path.basename(filePath)}"`,
       },
     });
   } catch (error) {

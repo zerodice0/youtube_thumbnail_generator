@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import styles from './page.module.css';
+import Link from 'next/link';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
@@ -9,6 +10,11 @@ const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu
 export default function Home() {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
+  const [uuid, setUuid] = useState('');
+  const [status, setStatus] = useState('');
+  const [audioFilePath, setAudioFilePath] = useState('');
+  const [subtitleFilePath, setSubtitleFilePath] = useState('');
+  const [summary, setSummary] = useState('');
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const validateYoutubeUrl = (url: string) => {
@@ -27,6 +33,11 @@ export default function Home() {
     }
 
     setError('');
+    setStatus('');
+    setUuid('');
+    setAudioFilePath('');
+    setSubtitleFilePath('');
+    setSummary('');
     
     const apiUrl = `/api/download/youtube/transcribe?url=${encodeURIComponent(url)}`;
     
@@ -37,10 +48,32 @@ export default function Home() {
     
     eventSourceRef.current = new EventSource(apiUrl);
 
-    // 특정 이벤트 타입별 핸들러 추가
-    eventSourceRef.current.addEventListener('ping', (event: MessageEvent) => {
+    eventSourceRef.current.addEventListener('downloading', (event: MessageEvent) => {
       const data = JSON.parse(event.data);
-      console.log('Received data: ', data);
+      setStatus(`⏳ downloading...`);
+      setUuid(data.uuid);
+      console.log('Downloading event received: ', data);
+    });
+
+    eventSourceRef.current.addEventListener('transcribing', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      setStatus(`📝 transcribing...`);
+      setAudioFilePath(data.audioFile);
+      console.log('Transcribing event received: ', data);
+    });
+
+    eventSourceRef.current.addEventListener('summarizing', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      setStatus(`🤔 summarizing...`);
+      setSubtitleFilePath(data.subtitleFile);
+      console.log('Summarizing event received: ', data);
+    });
+
+    eventSourceRef.current.addEventListener('completed', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      setStatus(`✅ completed (${data.uuid})`);
+      setSummary(data.summary);
+      console.log('Completed event received: ', data);
     });
 
     eventSourceRef.current.addEventListener('close', (event: MessageEvent) => {
@@ -95,6 +128,30 @@ export default function Home() {
           <div className={styles.errorMessage}>
             {error}
           </div>
+
+          {uuid && <div className={styles.status}>
+            <label htmlFor='uuid_text'>UUID:</label>
+            <span id='uuid_text'>🔑 {uuid}</span>
+          </div>}
+          {status && <div className={styles.status}>
+            <label htmlFor='status_text'>Status:</label>
+            <span id='status_text'>{status}</span>
+          </div>}
+
+          {audioFilePath && <div className={styles.status}>
+            <label htmlFor='audio_file_path'>Audio File Path:</label>
+            <Link id='audio_file_path' target='_blank' href={audioFilePath}>🔉 Download Audio</Link>
+          </div>}
+
+          {subtitleFilePath && <div className={styles.status}>
+            <label htmlFor='subtitle_file_path'>Subtitle File Path:</label>
+            <Link id='subtitle_file_path' target='_blank' href={subtitleFilePath}>📝 Download Subtitle</Link>
+          </div>}
+
+          {summary && <div className={styles.status}>
+            <label htmlFor='summary'>Summary:</label>
+            <span id='summary'>{summary}</span>
+          </div>}
         </div>
       </main>
     </div>

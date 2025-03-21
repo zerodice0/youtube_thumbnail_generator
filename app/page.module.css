@@ -9,7 +9,6 @@
   margin: 0.5rem 0 -0.5rem 0;
 }
 
-
 .main {
   display: flex;
   flex-direction: column;
@@ -66,4 +65,11 @@
   justify-content: start;
   flex: 1;
   color: red;
+}
+
+.status {
+  display: flex;
+  font-size: 0.8rem;
+  flex-direction: row;
+  gap: 0.5rem;
 }
