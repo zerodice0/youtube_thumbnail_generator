@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './page.module.css';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
+
 export default function Home() {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   const validateYoutubeUrl = (url: string) => {
     return YOUTUBE_URL_REGEX.test(url);
@@ -26,7 +28,30 @@ export default function Home() {
 
     setError('');
     
-    console.log('Transcribe button clicked', url);
+    const apiUrl = `/api/download/youtube/transcribe?url=${encodeURIComponent(url)}`;
+    
+    // 이미 연결된 이벤트 소스가 있다면 닫기
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+    
+    eventSourceRef.current = new EventSource(apiUrl);
+
+    // 특정 이벤트 타입별 핸들러 추가
+    eventSourceRef.current.addEventListener('ping', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      console.log('Received data: ', data);
+    });
+
+    eventSourceRef.current.addEventListener('close', (event: MessageEvent) => {
+      console.log('Close event received: ', JSON.parse(event.data));
+      eventSourceRef.current?.close();
+    });
+
+    eventSourceRef.current.addEventListener('error', (event: MessageEvent) => {
+      console.error('Error event: ', event.data ? JSON.parse(event.data) : 'Connection error');
+      eventSourceRef.current?.close();
+    });
   };
 
   return (

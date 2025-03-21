@@ -58,8 +58,8 @@ const requestYoutubeAudioTranscribe = async (youtubeUrl: string, uuid: string) =
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { youtubeUrl } = body;
-  
+
+  const { youtubeUrl } = body;  
 
   if (!youtubeUrl) {
     return NextResponse.json({ error: "Youtube URL is required" }, { status: 400 });
