@@ -7,7 +7,7 @@ import { summarizeText } from "@/lib/modules/openai/openai";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uuid: string } }
+  { params }: any
 ) {
   const { uuid } = await params;
   console.log(`🔍 [${uuid}] Checking digest`);

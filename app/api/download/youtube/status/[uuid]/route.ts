@@ -4,7 +4,7 @@ import { getFullUrl } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uuid: string } }
+  { params }: any
 ) {
   const { uuid } = await params;
 

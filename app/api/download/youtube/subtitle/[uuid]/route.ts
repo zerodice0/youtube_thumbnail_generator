@@ -6,7 +6,7 @@ import fs from "fs-extra";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uuid: string } }
+  { params }: any
 ) {
   const { uuid } = await params;
 

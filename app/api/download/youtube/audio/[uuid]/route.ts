@@ -8,9 +8,9 @@ export const runtime = 'nodejs';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uuid: string } }
+  context: any
 ) {
-  const { uuid } = await params;
+  const { uuid } = await context.params;
 
   const download = await prisma.youtubeAudioDownload.findUnique({
     where: { id: uuid },
