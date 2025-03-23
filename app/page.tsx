@@ -88,7 +88,7 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.container}>
+    <div>
       <header className={styles.header}>
         <h1>YouTube Transcribe Tool</h1>
         <p>
@@ -96,7 +96,7 @@ export default function Home() {
         </p>
       </header>
       <main className={styles.main}>
-        <div className={styles.mainContainer}>
+        <div className={styles.container}>
           <label htmlFor="youtube-url" className={styles.labelYoutubeUrl}>
             YouTube URL:
           </label>
@@ -129,7 +129,7 @@ export default function Home() {
             {error}
           </div>
 
-          {uuid && <div className={styles.status}>
+          {/* {uuid && <div className={styles.status}>
             <label htmlFor='uuid_text'>UUID:</label>
             <span id='uuid_text'>🔑 {uuid}</span>
           </div>}
@@ -151,7 +151,14 @@ export default function Home() {
           {summary && <div className={styles.status}>
             <label htmlFor='summary'>Summary:</label>
             <span id='summary'>{summary}</span>
-          </div>}
+          </div>} */}
+        </div>
+        <div className={styles.container}>
+          <div className={styles.statusContainer}>
+            <label htmlFor='uuid'>처리상태</label>
+            <span id='uuid'>({uuid})</span>
+          </div>
+
         </div>
       </main>
     </div>
