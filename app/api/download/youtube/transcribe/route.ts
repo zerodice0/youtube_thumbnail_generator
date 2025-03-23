@@ -5,7 +5,6 @@ import { AUDIO_DOWNLOAD_PATH, SUBTITLE_DOWNLOAD_PATH } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import fs from "fs-extra";
-import { PROJECT_ROOT } from "@/lib/utils";
 import { summarizeText } from "@/lib/modules/openai/openai";
 
 interface TranscribingData {
@@ -30,7 +29,7 @@ export async function GET(request: NextRequest) {
   });
 
   // if (existingDownload) {
-    
+      
   // }
   
   const encoder = new TextEncoder();
@@ -114,8 +113,6 @@ export async function GET(request: NextRequest) {
           subtitleFile: `/api/download/youtube/subtitle/${task.id}`,
         });
 
-        console.log('subtitleFilePath', subtitleFilePath);
-
         const subtitleData = subtitleFilePath && fs.readFileSync(`${subtitleFilePath}`, "utf-8");
         const summary = await summarizeText(subtitleData);
 
@@ -125,13 +122,10 @@ export async function GET(request: NextRequest) {
           summary: summary,
         });
         
-        // 메시지 타입에 맞는 이벤트 발송
-        // sendEvent('ping', { message: 'pong' });
         sendEvent('close', { 
           message: 'close' 
         });
       } catch (error) {
-        console.error('Error: ', error);
         sendEvent('error', { message: 'Internal Server Error' });
       } finally {
         controller.close();
