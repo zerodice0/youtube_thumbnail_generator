@@ -7,7 +7,7 @@ BASE_URL=http://localhost
 PORT=3000
 WHISPER_BIN_PATH= # whisper.cpp 바이너리 경로
 WHISPER_MODEL_PATH= # whisper.cpp 모델 경로
-OPENAI_API_KEY= # OpenAI API Key
+YOUTUBE_API_KEY= # YouTube Data API Key
 DATABASE_URL= # Prisma 데이터베이스 연결 문자열
 ```
 
@@ -40,7 +40,7 @@ docker build --no-cache -t whisper-server .
 
 ### 도커 컨테이너 실행
 ```
-docker run -d --name whisper-instance -p 3000:3000 whisper-server
+docker run -p 3000:3000 --add-host=host.docker.internal:host-gateway whisper-server --name whisper-server
 ```
 
 ### 도커 컨테이너 쉘 접속
