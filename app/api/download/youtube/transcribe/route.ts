@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import fs from "fs-extra";
 import { summarizeText } from "@/lib/modules/openai/openai";
+import { getYoutubeInformation } from "@/lib/modules/youtube/getInformation";
 
 interface TranscribingData {
   status: 'downloading' | 'transcribing' | 'complete' | 'error';
@@ -22,11 +23,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing URL parameter' }, { status: 400 });
   }
   
-  const existingDownload = await prisma.youtubeAudioDownload.findFirst({
-    where: {
-      youtubeUrl,
-    },
-  });
+  // const existingDownload = await prisma.youtubeAudioDownload.findFirst({
+  //   where: {
+  //     youtubeUrl,
+  //   },
+  // });
 
   // if (existingDownload) {
       
@@ -39,6 +40,17 @@ export async function GET(request: NextRequest) {
       const sendEvent = (eventType: string, data: any) => {
         const event = `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
         controller.enqueue(encoder.encode(event));
+      }
+
+      try {
+        const information = await getYoutubeInformation(youtubeUrl);
+
+        sendEvent('information', {
+          title: information.title,
+          thumbnail: information.thumbnail,
+        });
+      } catch (error) {
+        sendEvent('error', { message: 'Internal Server Error' });
       }
 
       try {

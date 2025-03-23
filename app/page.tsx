@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import styles from './page.module.css';
 import Link from 'next/link';
+import { ExternalLink, FileAudio, FileText } from 'lucide-react';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
@@ -11,6 +12,8 @@ export default function Home() {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [uuid, setUuid] = useState('');
+  const [title, setTitle] = useState('');
+  const [thumbnail, setThumbnail] = useState('');
   const [status, setStatus] = useState('');
   const [audioFilePath, setAudioFilePath] = useState('');
   const [subtitleFilePath, setSubtitleFilePath] = useState('');
@@ -19,6 +22,30 @@ export default function Home() {
 
   const validateYoutubeUrl = (url: string) => {
     return YOUTUBE_URL_REGEX.test(url);
+  };
+
+  const handleDownloadAudio = () => {
+    if (audioFilePath) {
+      const link = document.createElement('a');
+      link.href = audioFilePath;
+      link.setAttribute('download', `${title}.mp3`);
+      link.setAttribute('target', '_blank');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleDownloadSubtitle = () => {
+    if (subtitleFilePath) {
+      const link = document.createElement('a');
+      link.href = subtitleFilePath;
+      link.setAttribute('download', `${title}.srt`);
+      link.setAttribute('target', '_blank');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   const handleTranscribe = () => {
@@ -48,6 +75,13 @@ export default function Home() {
     
     eventSourceRef.current = new EventSource(apiUrl);
 
+    eventSourceRef.current.addEventListener('information', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      setTitle(data.title);
+      setThumbnail(data.thumbnail);
+      console.log('Information event received: ', data);
+    });
+
     eventSourceRef.current.addEventListener('downloading', (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       setStatus(`⏳ downloading...`);
@@ -71,7 +105,7 @@ export default function Home() {
 
     eventSourceRef.current.addEventListener('completed', (event: MessageEvent) => {
       const data = JSON.parse(event.data);
-      setStatus(`✅ completed (${data.uuid})`);
+      setStatus(`✅ completed`);
       setSummary(data.summary);
       console.log('Completed event received: ', data);
     });
@@ -83,6 +117,7 @@ export default function Home() {
 
     eventSourceRef.current.addEventListener('error', (event: MessageEvent) => {
       console.error('Error event: ', event.data ? JSON.parse(event.data) : 'Connection error');
+      setStatus(`❌ error`);
       eventSourceRef.current?.close();
     });
   };
@@ -128,38 +163,48 @@ export default function Home() {
           <div className={styles.errorMessage}>
             {error}
           </div>
-
-          {/* {uuid && <div className={styles.status}>
-            <label htmlFor='uuid_text'>UUID:</label>
-            <span id='uuid_text'>🔑 {uuid}</span>
-          </div>}
-          {status && <div className={styles.status}>
-            <label htmlFor='status_text'>Status:</label>
-            <span id='status_text'>{status}</span>
-          </div>}
-
-          {audioFilePath && <div className={styles.status}>
-            <label htmlFor='audio_file_path'>Audio File Path:</label>
-            <Link id='audio_file_path' target='_blank' href={audioFilePath}>🔉 Download Audio</Link>
-          </div>}
-
-          {subtitleFilePath && <div className={styles.status}>
-            <label htmlFor='subtitle_file_path'>Subtitle File Path:</label>
-            <Link id='subtitle_file_path' target='_blank' href={subtitleFilePath}>📝 Download Subtitle</Link>
-          </div>}
-
-          {summary && <div className={styles.status}>
-            <label htmlFor='summary'>Summary:</label>
-            <span id='summary'>{summary}</span>
-          </div>} */}
         </div>
-        <div className={styles.container}>
-          <div className={styles.statusContainer}>
-            <label htmlFor='uuid'>처리상태</label>
-            <span id='uuid'>({uuid})</span>
+        {uuid && <div className={styles.container}>
+          <div className={styles.youtubeTitleContainer}>
+            <label htmlFor='status' className={styles.youtubeTitle}>{title}</label>
+            {
+              status && 
+              <div className={styles.status} id='status'>
+                {status}
+              </div>
+            }
           </div>
-
-        </div>
+          <div className={styles.youtubeInformationContainer}>
+            <img src={thumbnail} alt="Thumbnail" width="240" height="180"/>
+            <div className={styles.youtubeInformation}>
+              <label htmlFor='url'>URL: </label>
+              <Link id='url' target='_blank' href={url}>{url} <ExternalLink size={16} /></Link>
+              <div className={styles.youtubeInformationButtonContainer}>
+                {
+                  audioFilePath && 
+                  <button onClick={handleDownloadAudio}>
+                    <FileAudio size={16} />
+                    <span>MP3 다운로드</span>
+                  </button>
+                }
+                {
+                  subtitleFilePath && 
+                  <button onClick={handleDownloadSubtitle}>
+                    <FileText size={16} />
+                    <span>SRT 자막 다운로드</span>
+                  </button>
+                }
+              </div>
+              {
+                summary && 
+                <div className={styles.youtubeInformationSummary}>
+                  <label htmlFor='summary'>요약: </label>
+                  <span id='summary'>{summary}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>}
       </main>
     </div>
   );
