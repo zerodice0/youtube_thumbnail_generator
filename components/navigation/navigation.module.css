@@ -1,0 +1,37 @@
+.navigator {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.navigatorTitle {
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: black;
+}
+
+.navigatorItems {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navigatorItem {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+}
+
+.navigationItemLink {
+  text-decoration: none;
+  color: black;
+}
+
+.navigationItemLink.active{
+  font-weight: bold;
+
+}
