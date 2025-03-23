@@ -83,6 +83,8 @@ export function extractYoutubeVideoId(url: string): string | null {
 interface YoutubeInformation {
   title: string;
   thumbnail: string;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
 }
 
 export async function getYoutubeInformation(url: string): Promise<YoutubeInformation> {
@@ -104,10 +106,14 @@ export async function getYoutubeInformation(url: string): Promise<YoutubeInforma
   const item = items[0];
   const snippet = item.snippet;
   const title = snippet.title;
-  const thumbnail = snippet.thumbnails.default.url;
+  const thumbnail = snippet.thumbnails.high.url;
+  const thumbnailWidth = snippet.thumbnails.high.width;
+  const thumbnailHeight = snippet.thumbnails.high.height;
 
   return {
     title,
     thumbnail,
+    thumbnailWidth,
+    thumbnailHeight,
   };
 }
