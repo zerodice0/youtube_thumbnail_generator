@@ -7,6 +7,7 @@ BASE_URL=http://localhost
 PORT=3000
 WHISPER_BIN_PATH= # whisper.cpp 바이너리 경로
 WHISPER_MODEL_PATH= # whisper.cpp 모델 경로
+OLLAMA_URL=http://localhost:11434 # Ollama 서버 주소
 YOUTUBE_API_KEY= # YouTube Data API Key
 DATABASE_URL= # Prisma 데이터베이스 연결 문자열
 ```
