@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import styles from './page.module.css';
 import Link from 'next/link';
-import { ExternalLink, FileAudio, FileText } from 'lucide-react';
+import { AlertCircle, ExternalLink, FileAudio, FileText } from 'lucide-react';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
@@ -118,6 +118,7 @@ export default function Home() {
     eventSourceRef.current.addEventListener('error', (event: MessageEvent) => {
       console.error('Error event: ', event.data ? JSON.parse(event.data) : 'Connection error');
       setStatus(`❌ error`);
+      setError(event.data ? JSON.parse(event.data).message : 'Connection error');
       eventSourceRef.current?.close();
     });
   };
@@ -149,9 +150,6 @@ export default function Home() {
                 }
               }
             />
-            {error && (
-              <p className={styles.errorMessage}>{error}</p>
-            )}
             <button 
               onClick={handleTranscribe}
               className={styles.transcribeButton}
@@ -161,6 +159,7 @@ export default function Home() {
           </div>
 
           <div className={styles.errorMessage}>
+            <AlertCircle size={16} />
             {error}
           </div>
         </div>

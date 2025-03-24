@@ -8,13 +8,6 @@ import fs from "fs-extra";
 import { summarizeText } from "@/lib/modules/openai/openai";
 import { getYoutubeInformation } from "@/lib/modules/youtube/getInformation";
 
-interface TranscribingData {
-  status: 'downloading' | 'transcribing' | 'complete' | 'error';
-  audioFilePath: string | null;
-  subtitleFilePath: string | null;
-  summary: string | null;
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const youtubeUrl = searchParams.get('url');
@@ -50,36 +43,40 @@ export async function GET(request: NextRequest) {
           thumbnail: information.thumbnail,
         });
       } catch (error) {
-        sendEvent('error', { message: 'Internal Server Error' });
+        sendEvent('error', { message: 'Can\'t get youtube information' });
+        throw error;
+      } finally {
+        controller.close();
       }
 
+      // generate task
+      const task = await prisma.youtubeAudioDownload.create({
+        data: {
+          youtubeUrl,
+          audioFilePath: "",
+          subtitleFilePath: "",
+          summary: "",
+        },
+      });
+      
+      // update status to database
+      await prisma.youtubeAudioDownload.update({
+        where: { id: task.id },
+        data: {
+          status: DonwloadStatus.downloading,
+        },
+      });
+      
+      // send event to client
+      sendEvent('downloading', {
+        status: 'downloading',
+        uuid: task.id,
+      });
+      
+      let audioFilePath = "";
       try {
-        // generate task
-        const task = await prisma.youtubeAudioDownload.create({
-          data: {
-            youtubeUrl,
-            audioFilePath: "",
-            subtitleFilePath: "",
-            summary: "",
-          },
-        });
-
-        // update status to database
-        await prisma.youtubeAudioDownload.update({
-          where: { id: task.id },
-          data: {
-            status: DonwloadStatus.downloading,
-          },
-        });
-
-        // send event to client
-        sendEvent('downloading', {
-          status: 'downloading',
-          uuid: task.id,
-        });
-
         // start download audio
-        const audioFilePath = await downloadYoutubeAudio(
+        audioFilePath = await downloadYoutubeAudio(
           youtubeUrl,
           AUDIO_DOWNLOAD_PATH,
           task.id,
@@ -100,9 +97,17 @@ export async function GET(request: NextRequest) {
           uuid: task.id,
           audioFile: `/api/download/youtube/audio/${task.id}`,
         });
+      } catch (error) {
+        sendEvent('error', { message: 'Failed to download audio' });
+        throw error;
+      } finally {
+        controller.close();
+      }
         
+      let subtitleFilePath = "";
+      try {
         // start transcribe audio
-        const subtitleFilePath = await transcribeAudio(
+        subtitleFilePath = await transcribeAudio(
           audioFilePath,
           SUBTITLE_DOWNLOAD_PATH,
           task.id,
@@ -124,24 +129,32 @@ export async function GET(request: NextRequest) {
           uuid: task.id,
           subtitleFile: `/api/download/youtube/subtitle/${task.id}`,
         });
+      } catch (error) {
+        sendEvent('error', { message: 'Failed to transcribe audio' });
+        throw error;
+      } finally {
+        controller.close();
+      }
 
+      try {
         const subtitleData = subtitleFilePath && fs.readFileSync(`${subtitleFilePath}`, "utf-8");
         const summary = await summarizeText(subtitleData);
-
+  
         sendEvent('completed', {
           status: 'completed',
           uuid: task.id,
           summary: summary,
         });
-        
-        sendEvent('close', { 
-          message: 'close' 
-        });
       } catch (error) {
-        sendEvent('error', { message: 'Internal Server Error' });
+        sendEvent('error', { message: 'Failed to summarize text' });
+        throw error;
       } finally {
         controller.close();
       }
+      
+      sendEvent('close', { 
+        message: 'close' 
+      });
     }
   });
 
