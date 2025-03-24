@@ -98,8 +98,6 @@ export async function getYoutubeInformation(url: string): Promise<YoutubeInforma
     `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${process.env.YOUTUBE_API_KEY}`
   );
 
-  console.log(youtubeResponse);
-
   const items = youtubeResponse.data.items;
   if (items.length === 0) {
     throw new Error("Video not found");

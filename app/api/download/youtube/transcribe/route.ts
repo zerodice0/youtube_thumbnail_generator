@@ -44,9 +44,8 @@ export async function GET(request: NextRequest) {
         });
       } catch (error) {
         sendEvent('error', { message: 'Can\'t get youtube information' });
-        throw error;
-      } finally {
         controller.close();
+        throw error;
       }
 
       // generate task
@@ -99,11 +98,10 @@ export async function GET(request: NextRequest) {
         });
       } catch (error) {
         sendEvent('error', { message: 'Failed to download audio' });
-        throw error;
-      } finally {
         controller.close();
+        throw error;
       }
-        
+
       let subtitleFilePath = "";
       try {
         // start transcribe audio
@@ -131,9 +129,8 @@ export async function GET(request: NextRequest) {
         });
       } catch (error) {
         sendEvent('error', { message: 'Failed to transcribe audio' });
-        throw error;
-      } finally {
         controller.close();
+        throw error;
       }
 
       try {
@@ -147,14 +144,15 @@ export async function GET(request: NextRequest) {
         });
       } catch (error) {
         sendEvent('error', { message: 'Failed to summarize text' });
-        throw error;
-      } finally {
         controller.close();
+        throw error;
       }
-      
+
       sendEvent('close', { 
         message: 'close' 
       });
+
+      controller.close();
     }
   });
 
