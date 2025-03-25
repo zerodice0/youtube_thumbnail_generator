@@ -7,6 +7,7 @@ services:
       dockerfile: dockerfile
     ports:
       - "3000:3000"
+      - "11434:11434"
     environment:
       - DATABASE_URL=postgresql://zerodice0:890421@host.docker.internal:5432/your_database
     extra_hosts:

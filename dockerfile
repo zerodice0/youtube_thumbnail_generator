@@ -69,7 +69,7 @@ npx prisma migrate deploy\n\
 \n\
 # Ollama 서버 시작\n\
 echo "Starting Ollama server..."\n\
-ollama serve &\n\
+OLLAMA_HOST=0.0.0.0:11434 ollama serve &\n\
 OLLAMA_PID=$!\n\
 # Ollama 서버가 시작될 때까지 대기\n\
 echo "Waiting for Ollama server to start..."\n\
@@ -85,7 +85,7 @@ echo "Building server..."\n\
 npm run build\n\
 # Node.js 서버 시작\n\
 echo "Starting Node.js server..."\n\
-npx next start\n\
+npx next start -H 0.0.0.0\n\
 ' > /start.sh && chmod +x /start.sh
 
 # 시작 스크립트 실행
