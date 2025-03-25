@@ -7,7 +7,8 @@
  * - peek: O(1)
  */
 export class PriorityQueue<T> {
-  private heap: Array<[T, number]> = [];
+  private heap: Array<[T, number, number]> = []; // [element, priority, insertOrder]
+  private insertCount = 0; // 삽입 순서를 추적하는 카운터
   
   /**
    * 우선순위 큐 생성자
@@ -24,7 +25,7 @@ export class PriorityQueue<T> {
    * @returns 큐의 크기
    */
   enqueue(element: T, priority: number): number {
-    this.heap.push([element, priority]);
+    this.heap.push([element, priority, this.insertCount++]);
     return this.siftUp(this.heap.length - 1);
   }
   
@@ -36,9 +37,9 @@ export class PriorityQueue<T> {
     if (this.isEmpty()) return null;
     
     const top = this.heap[0];
-    const bottom = this.heap.pop()!;
+    const bottom = this.heap.pop();
     
-    if (this.heap.length > 0) {
+    if (this.heap.length > 0 && bottom) {
       this.heap[0] = bottom;
       this.siftDown(0);
     }
@@ -75,6 +76,7 @@ export class PriorityQueue<T> {
    */
   clear(): void {
     this.heap = [];
+    this.insertCount = 0;
   }
   
   /**
@@ -90,10 +92,22 @@ export class PriorityQueue<T> {
     tempQueue.heap = sortedHeap;
     
     while (!tempQueue.isEmpty()) {
-      result.push(tempQueue.dequeue()!);
+      const element = tempQueue.dequeue();
+      if (element) {
+        result.push(element);
+      }
     }
     
     return result;
+  }
+
+  /**
+   * 두 요소의 우선순위와 삽입 순서를 비교
+   */
+  private compareItems(a: [T, number, number], b: [T, number, number]): number {
+    const priorityCompare = this.compareFn(a[1], b[1]);
+    // 우선순위가 같으면 삽입 순서로 비교 (먼저 들어온 것이 우선)
+    return priorityCompare === 0 ? a[2] - b[2] : priorityCompare;
   }
   
   /**
@@ -111,7 +125,7 @@ export class PriorityQueue<T> {
       const parent = this.heap[parentIndex];
       
       // 부모의 우선순위가 더 높거나 같으면 중단
-      if (this.compareFn(inserted[1], parent[1]) >= 0) break;
+      if (this.compareItems(inserted, parent) >= 0) break;
       
       // 부모 요소를 아래로 이동
       this.heap[currentIndex] = parent;
@@ -143,7 +157,7 @@ export class PriorityQueue<T> {
       // 왼쪽 자식이 있고 현재 요소보다 우선순위가 높은 경우
       if (leftChildIndex < heapSize) {
         const leftChild = this.heap[leftChildIndex];
-        if (this.compareFn(leftChild[1], element[1]) < 0) {
+        if (this.compareItems(leftChild, element) < 0) {
           swapIndex = leftChildIndex;
         }
       }
@@ -154,8 +168,8 @@ export class PriorityQueue<T> {
         
         // swapIndex가 설정되지 않았거나, 오른쪽 자식이 왼쪽 자식보다 우선순위가 높은 경우
         if (
-          swapIndex === -1 && this.compareFn(rightChild[1], element[1]) < 0 ||
-          swapIndex !== -1 && this.compareFn(rightChild[1], this.heap[swapIndex][1]) < 0
+          (swapIndex === -1 && this.compareItems(rightChild, element) < 0) ||
+          (swapIndex !== -1 && this.compareItems(rightChild, this.heap[swapIndex]) < 0)
         ) {
           swapIndex = rightChildIndex;
         }
