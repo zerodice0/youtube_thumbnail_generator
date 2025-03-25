@@ -11,7 +11,7 @@ export default function Navigation() {
 
   return (
     <nav className={styles.navigator}>
-      <Link className={styles.navigatorTitle} href="/">YouTube Audio Transcriptor</Link>
+      <Link className={styles.navigatorTitle} href="/">Youtube 오디오 다운로드 및 자막 생성 툴</Link>
       <div className={styles.navigatorItems}>
         <div className={styles.navigatorItem}>
           <Home size={16} />
@@ -19,7 +19,7 @@ export default function Navigation() {
             href="/"
             className={`${styles.navigationItemLink} ${pathname === '/' ? styles.active : ''}`}
           >
-            Home
+            처리 요청
           </Link>
         </div>
         <span className={styles.navigatorSeparator}>|</span>
@@ -29,7 +29,7 @@ export default function Navigation() {
             href="/history"
             className={`${styles.navigationItemLink} ${pathname === '/history' ? styles.active : ''}`}
           >
-            History
+            처리 내역
           </Link>
         </div>
       </div>

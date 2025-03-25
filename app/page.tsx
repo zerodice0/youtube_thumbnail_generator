@@ -126,9 +126,9 @@ export default function Home() {
   return (
     <div>
       <header className={styles.header}>
-        <h1>YouTube Transcribe Tool</h1>
+        <h1>YouTube 오디오 다운로드 및 자막 생성 툴</h1>
         <p>
-          This application allows you to download audio from YouTube videos, transcribe it, and generate summaries.
+          YouTube 주소를 입력하면 오디오 파일을 다운로드하고, 자막을 생성합니다.
         </p>
       </header>
       <main className={styles.main}>
@@ -136,7 +136,7 @@ export default function Home() {
           <label htmlFor="youtube-url" className={styles.labelYoutubeUrl}>
             YouTube URL:
           </label>
-          <div className={styles.inputGroup}>
+          <form className={styles.inputGroup}>
             <input
               id="youtube-url"
               type="text"
@@ -150,18 +150,21 @@ export default function Home() {
                 }
               }
             />
-            <button 
+            <button type="submit"
+              aria-label="Transcribe"
               onClick={handleTranscribe}
               className={styles.transcribeButton}
             >
               Transcribe
             </button>
-          </div>
+          </form>
 
-          <div className={styles.errorMessage}>
-            <AlertCircle size={16} />
-            {error}
-          </div>
+          {
+            error && <div className={styles.errorMessage}>
+              <AlertCircle size={16} />
+              {error}
+            </div>
+          }
         </div>
         {uuid && <div className={styles.container}>
           <div className={styles.youtubeTitleContainer}>
