@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { jobQueue } from "@/lib/modules/events/jobQueue";
+import { randomUUID } from "crypto";
+import EventEmitter from "@/lib/modules/events/eventEmitter";
 
 export async function POST(
   request: NextRequest,
@@ -13,4 +16,30 @@ export async function POST(
       { status: 400 }
     );
   }
+
+  jobQueue.addJob({
+    id: randomUUID(),
+    youtubeUrl: url,
+    priority: 1,
+    status: 'queued',
+    createdAt: new Date(),
+  });
+
+  return NextResponse.json({ message: 'Job added to queue' }, { status: 200 });
+}
+
+export async function GET(request: NextRequest, response: NextResponse) {
+  const id = randomUUID();
+  const stream = new TransformStream();
+  const writer = stream.writable.getWriter();
+  
+  EventEmitter.addConnection(id, writer);
+  
+  return new Response(stream.readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+    }
+  });
 }
