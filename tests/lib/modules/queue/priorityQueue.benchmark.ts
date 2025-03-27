@@ -1,4 +1,4 @@
-import { PriorityQueue } from '../../../../lib/modules/queue/priorityQueue';
+import { PriorityQueue } from '@/lib/modules/dataStructures/PriorityQueue';
 
 /**
  * 힙 기반 우선순위 큐 성능 테스트

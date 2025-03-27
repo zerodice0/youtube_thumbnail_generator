@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, response: NextResponse) {
-	return NextResponse.json(
-		{
-			message: "Hello, world!",
-		}, {
-			status: 200,
-		}
-	);
+export async function POST(
+  request: NextRequest,
+  response: NextResponse,
+) {
+  const params = await request.json();
+  const url: string | null = params.url;
+
+  if (!url) {
+    return NextResponse.json(
+      { error: 'Missing URL parameter' },
+      { status: 400 }
+    );
+  }
 }
