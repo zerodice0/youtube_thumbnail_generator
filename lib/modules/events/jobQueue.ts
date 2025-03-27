@@ -1,5 +1,5 @@
 import { PriorityQueue } from '@/lib/modules/dataStructures/PriorityQueue';
-
+import EventEmitter from '@/lib/modules/events/eventEmitter';
 export interface Job {
   id: string;
   youtubeUrl: string;
@@ -27,6 +27,7 @@ class JobQueue {
   public addJob(job: Job): void {
     this.queue.enqueue(job, job.priority);
     this.processNextJob(); // 새 작업이 추가되면 처리 시도
+    EventEmitter.emit('jobAdded', job);
   }
 
   public getQueueStatus(): Job[] {
@@ -60,9 +61,11 @@ class JobQueue {
       // 실제 작업 처리 로직
       // 예: 유튜브 다운로드, 트랜스크립션 등
       job.status = 'completed';
+      EventEmitter.emit('jobCompleted', job);
     } catch (error) {
       job.status = 'failed';
       console.error(`Failed to process job ${job.id}:`, error);
+      EventEmitter.emit('jobFailed', job);
     }
   }
 }
