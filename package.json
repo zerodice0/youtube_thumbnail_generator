@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "benchmark": "node scripts/runBenchmark.js",
+    "benchmark": "ts-node scripts/runBenchmark.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
