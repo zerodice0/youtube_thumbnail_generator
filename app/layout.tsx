@@ -13,9 +13,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="next-app">
-      <Navigation />
       <head />
-      <body>{children}</body>
+      <body>
+        <Navigation />
+        {children}
+      </body>
     </html>
   )
 }
