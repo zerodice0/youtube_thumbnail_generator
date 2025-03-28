@@ -17,6 +17,11 @@ export default function Home() {
       console.log(data);
     };
 
+    eventSource.addEventListener('queueState', (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data);
+    });
+
     return () => {
       eventSource.close();
     };

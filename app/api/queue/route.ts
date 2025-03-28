@@ -30,7 +30,16 @@ export async function POST(
 
 export async function GET(request: NextRequest, response: NextResponse) {
   const id = randomUUID();
-  const stream = new TransformStream();
+	const encoder = new TextEncoder();
+  const stream = new TransformStream({
+		async start(controller) {
+			const queueStatus = await jobQueue.getQueueStatus();
+			const message = `event: queueState\ndata: ${JSON.stringify(queueStatus)}\n\n`;
+			
+			controller.enqueue(encoder.encode(message));
+		}
+	});
+
   const writer = stream.writable.getWriter();
   
   EventEmitter.addConnection(id, writer);
