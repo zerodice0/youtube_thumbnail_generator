@@ -20,6 +20,11 @@ export async function POST(
   jobQueue.addJob({
     id: randomUUID(),
     youtubeUrl: url,
+    yotubeTitle: '',
+    thumbnailUrl: '',
+    audioFilePath: '',
+    transcriptFilePath: '',
+    summary: '',
     priority: 1,
     status: 'queued',
     createdAt: new Date(),
