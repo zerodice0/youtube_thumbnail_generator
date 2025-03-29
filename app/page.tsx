@@ -1,34 +1,49 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './page.module.css';
-import Link from 'next/link';
-import { AlertCircle, ExternalLink, FileAudio, FileText } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { Job } from '@/lib/modules/events/jobQueue';
+import JobStateCard from '@/components/jobStateCard/jobStateCard';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
 export default function Home() {
+  const [url, setUrl] = useState('');
+  const [error, setError] = useState('');
+  const [queueState, setQueueState] = useState<Job[]>([]);
+
   useEffect(() => {
     const eventSource = new EventSource(`/api/queue`);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
+      console.log('onmessage', data);
     };
 
     eventSource.addEventListener('queueState', (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
+      const processedData = data.map((job: Job) => {
+        return {
+          ...job,
+          createdAt: new Date(job.createdAt),
+        };
+      });
+
+      console.log('queueState', processedData);
+      setQueueState(processedData);
+    });
+
+    eventSource.addEventListener('jobAdded', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('added', data);
     });
 
     return () => {
       eventSource.close();
     };
   }, []);
-
-  const [url, setUrl] = useState('');
-  const [error, setError] = useState('');
   // const [uuid, setUuid] = useState('');
   // const [title, setTitle] = useState('');
   // const [thumbnail, setThumbnail] = useState('');
@@ -210,6 +225,9 @@ export default function Home() {
             </div>
           }
         </div>
+        {queueState.map((job: Job) => (
+          <JobStateCard key={job.id} job={job} />
+        ))}
         {/* {uuid && <div className={styles.container}>
           <div className={styles.youtubeTitleContainer}>
             <label htmlFor='status' className={styles.youtubeTitle}>{title}</label>
