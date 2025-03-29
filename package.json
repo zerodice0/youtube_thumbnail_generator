@@ -7,6 +7,7 @@
     "test:watch": "jest --watch",
     "benchmark": "ts-node scripts/runBenchmark.ts",
     "dev": "next dev",
+    "dev:dummy": "NODE_ENV=development USE_DUMMY_DATA=true next dev",
     "build": "next build",
     "start": "next start"
   },
