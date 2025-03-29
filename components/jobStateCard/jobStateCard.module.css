@@ -1,0 +1,103 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	border: 0.5px solid #000;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+
+	box-shadow: 0.15rem 0.15rem 0.1rem #00000025;
+}
+
+.youtubeTitleContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.youtubeTitle {
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+.status {
+	font-size: 0.8rem;
+	font-weight: bold;
+
+	padding: 0.3em;
+	background-color: #a1dd42;
+	border-radius: 0.5rem;
+	color: #ffffff;
+	
+	box-shadow: inset 0.15rem 0.15rem 0.1rem #00000025;
+	text-shadow: 0.15rem 0.15rem 0.1rem #00000025;
+}
+
+.createdAt {
+	font-size: 0.8rem;
+	color: #00000080;
+}
+
+.contentContainer {
+	display: flex;
+	align-items: start;
+	flex-direction: row;
+	gap: 0.5rem;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.youtubeUrl {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.2rem;
+}
+
+.youtubeUrl a {
+	text-decoration: none;
+}
+
+.contentContainer img {
+	display: flex;
+	box-shadow: inset 0.15rem 0.15rem 0.1rem #00000025;
+	border: 0.5px solid #00000025;
+	border-radius: 0.5rem;
+	margin: 0;
+	padding: 0;
+}
+
+.fileDownloadButtons {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5rem;
+}
+
+.fileDownloadButtons button {
+	display: flex;
+	gap: 0.2rem;
+	align-items: center;
+}
+
+.summary {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	margin-top: 0.5rem;
+}
+
+.summaryHeader {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.2rem;
+}
+
+.summaryHeader button {
+	display: flex;
+	gap: 0.2rem;
+}
