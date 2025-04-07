@@ -10,3 +10,4 @@ downloads
 .DS_Store
 .next
 /prisma/migrations
+*storybook.log
