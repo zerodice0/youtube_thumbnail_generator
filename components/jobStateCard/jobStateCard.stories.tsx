@@ -9,19 +9,18 @@ const meta = {
 export default meta;
 
 type DefaultStory = StoryObj<typeof meta>;
-
 export const Default: DefaultStory = {
   args: {
     job: {
 			id: '1',
 			createdAt: new Date(),
 			status: 'queued',
-			thumbnailUrl: 'https://placehold.co/600x400',
-			audioFilePath: 'https://placehold.co/600x400',
-			summary: 'This is a summary',
+			thumbnailUrl: null,
+			audioFilePath: null,
+			summary: null,
 			youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-			yotubeTitle: 'This is a title',
-			transcriptFilePath: 'https://placehold.co/600x400',
+			yotubeTitle: null,
+			subtitleFilePath: null,
 			priority: 1,
 		},
   }
@@ -40,7 +39,7 @@ export const Processing: ProcessingStory = {
 			summary: 'This is a summary',
 			youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 			yotubeTitle: 'This is a title',
-			transcriptFilePath: 'https://placehold.co/600x400',
+			subtitleFilePath: 'https://placehold.co/600x400',
 			priority: 1,
 		},
   }
@@ -59,7 +58,7 @@ export const Completed: CompletedStory = {
 			summary: 'This is a summary',
 			youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 			yotubeTitle: 'This is a title',
-			transcriptFilePath: 'https://placehold.co/600x400',
+			subtitleFilePath: 'https://placehold.co/600x400',
 			priority: 1,
 		},
   }
@@ -78,7 +77,7 @@ export const Failed: FailedStory = {
 			summary: 'This is a summary',
 			youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 			yotubeTitle: 'This is a title',
-			transcriptFilePath: 'https://placehold.co/600x400',
+			subtitleFilePath: 'https://placehold.co/600x400',
 			priority: 1,
 		},
   }
