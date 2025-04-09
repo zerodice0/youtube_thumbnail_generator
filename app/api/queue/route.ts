@@ -23,7 +23,7 @@ export async function POST(
     yotubeTitle: '',
     thumbnailUrl: '',
     audioFilePath: '',
-    transcriptFilePath: '',
+    subtitleFilePath: '',
     summary: '',
     priority: 1,
     status: 'queued',

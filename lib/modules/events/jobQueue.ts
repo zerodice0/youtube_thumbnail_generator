@@ -2,15 +2,15 @@ import { PriorityQueue } from '@/lib/modules/dataStructures/PriorityQueue';
 import EventEmitter from '@/lib/modules/events/eventEmitter';
 export interface Job {
   id: string;
-  yotubeTitle: string;
+  yotubeTitle: string | null;
   youtubeUrl: string;
-  thumbnailUrl: string;
-  audioFilePath: string;
-  transcriptFilePath: string;
+  thumbnailUrl: string | null;
+  audioFilePath: string | null;
+  subtitleFilePath: string | null;
   priority: number;
   status: 'queued' | 'processing' | 'completed' | 'failed';
   createdAt: Date;
-  summary: string;
+  summary: string | null;
 }
 
 class JobQueue {

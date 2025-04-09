@@ -225,50 +225,13 @@ export default function Home() {
             </div>
           }
         </div>
-        {queueState.map((job: Job) => (
-          <JobStateCard key={job.id} job={job} />
-        ))}
-        {/* {uuid && <div className={styles.container}>
-          <div className={styles.youtubeTitleContainer}>
-            <label htmlFor='status' className={styles.youtubeTitle}>{title}</label>
-            {
-              status && 
-              <div className={styles.status} id='status'>
-                {status}
-              </div>
-            }
-          </div>
-          <div className={styles.youtubeInformationContainer}>
-            <img src={thumbnail} alt="Thumbnail" width="240" height="180"/>
-            <div className={styles.youtubeInformation}>
-              <label htmlFor='url'>URL: </label>
-              <Link id='url' target='_blank' href={url}>{url} <ExternalLink size={16} /></Link>
-              <div className={styles.youtubeInformationButtonContainer}>
-                {
-                  audioFilePath && 
-                  <button onClick={handleDownloadAudio}>
-                    <FileAudio size={16} />
-                    <span>MP3 다운로드</span>
-                  </button>
-                }
-                {
-                  subtitleFilePath && 
-                  <button onClick={handleDownloadSubtitle}>
-                    <FileText size={16} />
-                    <span>SRT 자막 다운로드</span>
-                  </button>
-                }
-              </div>
-              {
-                summary && 
-                <div className={styles.youtubeInformationSummary}>
-                  <label htmlFor='summary'>요약: </label>
-                  <span id='summary'>{summary}</span>
-                </div>
-              }
-            </div>
-          </div>
-        </div>} */}
+        {
+          queueState.map(
+            (job: Job) => (
+              <JobStateCard key={job.id} job={job} />
+            )
+          )
+        }
       </main>
     </div>
   );

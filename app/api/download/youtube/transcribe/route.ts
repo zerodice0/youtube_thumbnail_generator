@@ -16,18 +16,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing URL parameter' }, { status: 400 });
   }
   
-  // const existingDownload = await prisma.youtubeAudioDownload.findFirst({
-  //   where: {
-  //     youtubeUrl,
-  //   },
-  // });
-
-  // if (existingDownload) {
-      
-  // }
-  
   const encoder = new TextEncoder();
-
   const stream = new ReadableStream({
     async start(controller) {
       const sendEvent = (eventType: string, data: any) => {
