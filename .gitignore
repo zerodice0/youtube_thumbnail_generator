@@ -11,3 +11,4 @@ downloads
 .next
 /prisma/migrations
 *storybook.log
+study/*

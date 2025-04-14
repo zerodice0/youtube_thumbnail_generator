@@ -26,14 +26,14 @@ export const Default: DefaultStory = {
   }
 };
 
-type ProcessingStory = StoryObj<typeof meta>;
+type DownloadingStory = StoryObj<typeof meta>;
 
-export const Processing: ProcessingStory = {
+export const Downloading: DownloadingStory = {
   args: {
     job: {
 			id: '1',
 			createdAt: new Date(),
-			status: 'processing',
+			status: 'downloading',
 			thumbnailUrl: 'https://placehold.co/600x400',
 			audioFilePath: 'https://placehold.co/600x400',
 			summary: 'This is a summary',

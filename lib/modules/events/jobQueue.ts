@@ -1,17 +1,6 @@
 import { PriorityQueue } from '@/lib/modules/dataStructures/PriorityQueue';
 import EventEmitter from '@/lib/modules/events/eventEmitter';
-export interface Job {
-  id: string;
-  yotubeTitle: string | null;
-  youtubeUrl: string;
-  thumbnailUrl: string | null;
-  audioFilePath: string | null;
-  subtitleFilePath: string | null;
-  priority: number;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
-  createdAt: Date;
-  summary: string | null;
-}
+import { Job } from '@/lib/models/job';
 
 class JobQueue {
   private static instance: JobQueue;
@@ -48,7 +37,7 @@ class JobQueue {
     try {
       const job = this.queue.dequeue();
       if (job) {
-        job.status = 'processing';
+        job.status = 'downloading';
         // 작업 처리 로직
         await this.processJob(job);
       }
