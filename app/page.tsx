@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 import { AlertCircle } from 'lucide-react';
 import axios from 'axios';
-import { Job } from '@/lib/modules/events/jobQueue';
 import JobStateCard from '@/components/jobStateCard/jobStateCard';
+import { Job } from '@/lib/models/job';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
 
@@ -37,7 +37,12 @@ export default function Home() {
 
     eventSource.addEventListener('jobAdded', (event) => {
       const data = JSON.parse(event.data);
-      console.log('added', data);
+
+      console.log('jobAdded', event, data);
+
+      setQueueState((prev) => [...prev, data]);
+      
+      console.log('jobAdded', data, queueState);
     });
 
     return () => {

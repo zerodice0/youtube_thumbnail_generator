@@ -10,7 +10,7 @@ class EventEmitter {
   }
 
   public static async emit(event: string, data: any) {
-    const message = `data: ${JSON.stringify({ event, data })}\n\n`;
+    const message = `event: ${event}\ndata: ${JSON.stringify({ data })}\n\n`;
     const encoder = new TextEncoder();
 
     Array.from(this.connections.entries()).forEach(async ([id, writer]) => {

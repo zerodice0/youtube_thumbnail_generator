@@ -1,4 +1,4 @@
-import { Job } from "@/lib/modules/events/jobQueue";
+import { Job } from "@/lib/models/job";
 import styles from './jobStateCard.module.css';
 import { ExternalLink, FileAudio, FileText, RefreshCwIcon } from "lucide-react";
 
